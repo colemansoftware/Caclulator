@@ -60,7 +60,7 @@
                     document.getElementById("result").innerHTML = this.responseText;
                     var result = this.responseText;
                     // console.log(result);
-                    if (result == 198){
+                    if (result == 1982){
                         launchConfetti();
                     }
                 }
