@@ -1,4 +1,5 @@
 <!-- Coleman DeMars -->
+<!-- https://coderbyte.com/question/php-application-4t4xvlj062#comment_userbtwiq195f -->
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -59,7 +60,7 @@
                     document.getElementById("result").innerHTML = this.responseText;
                     var result = this.responseText;
                     // console.log(result);
-                    if (result == 1984){
+                    if (result == 198){
                         launchConfetti();
                     }
                 }
