@@ -1,10 +1,9 @@
 <?php
-
 // get the input parenthesesmeter from URL
 
 $input = $_REQUEST["input"];
 $input = str_replace(" ", "+", $input);  // replace the space with +. not sure why this is occuring.
-// $input = ".5x(5+3)";
+// $input = "(1+1)+2x(2+3)";
 $input = str_split($input);  // create array
 $arr = [];
 $parenthesesArr = [];
@@ -17,26 +16,6 @@ for ($i = 0; $i < count($input); $i++) {
     if (is_numeric($input[$i]) || $input[$i] == ".") {
         $number .= $input[$i]; // add the . to the number 
     } else if (!is_numeric($input[$i])) { // not number
-        if ($input[$i] == "(") {
-            $firstparentheses = $i;
-            for ($g = $i; $g < count($input); $g++) {  // get the parentheses in the string and send to calculate
-                $parenthesesArr[] = $input[$g];
-                if ($input[$g] == ")") {
-                    for ($h = 0; $h < count($parenthesesArr); $h++) {  //check and remove the ()
-                        if ($parenthesesArr[$h] == "(" || $parenthesesArr[$h] == ")") {
-                            unset($parenthesesArr[$h]);
-                            $parenthesesArr = array_values($parenthesesArr); // reindex array
-                            $parenthesesCount++;
-                        }
-                    }
-
-                    $parenthesesSum = calculateString($parenthesesArr);  // returns the sum              
-                    array_splice($input, $firstparentheses, (count($parenthesesArr) + $parenthesesCount), $parenthesesSum);  //splice the result into the array. first array, start, length, other array
-                    $parenthesesCount = 0;
-                    $parenthesesArr = [];
-                }
-            }
-        }
         if (!empty($number)) {
             // if number is not empty add it to the array
             $arr[] = $number;
@@ -49,17 +28,39 @@ if (!empty($number)) {
     $arr[] = $number;
 }
 
-// print_r($arr);
-//send to the cacluate function 
+
+$tempArray = [];
+for ($i = 0; $i < count($arr); $i++){
+    if ($arr[$i] == "("){
+        for ($g = $i; $g < count($arr); $g++){
+            if ($arr[$g] == ")"){
+                array_push($tempArray, $arr[$g]);
+                array_splice($arr, $i, count($tempArray), calculateString($tempArray));  //splice the result into the array. first array, start, length, return array
+                //reset
+                $tempArray = [];
+                $i = 0;
+                break;
+            }else
+                array_push($tempArray, $arr[$g]);
+        }
+    }
+}
+
 echo calculateString($arr);
 
 // calculate
 function calculateString($arr){
+    //remove the p()) and calucate
+    for ($i = 0; $i < count($arr); $i++) {
+        if ($arr[$i] == "(" || $arr[$i] == ")") {
+            unset($arr[$i]);
+        }
+    }
+    $arr = array_values($arr); // reindex array
     $value = 0;
     $operator = null;
-    // echo count($arr);
     for ($i = 0; $i < count($arr); $i++) {
-        if (is_numeric($arr[$i]) && $operator) { // skips the operator and checks for the next number
+        if (is_numeric($arr[$i]) && $operator) { // skip the operator and checks for the next number
             if ($operator == "x") {
                 $value = $value * $arr[$i];
             }
@@ -82,9 +83,7 @@ function calculateString($arr){
         }
     }
     if (strpos($value, ".") !== false) {
-        // echo number_format($value, 3);
-        $value = number_format($value, 3);
-        return $value;
+        return number_format($value, 3);
     } else return $value;
 }
 ?>
